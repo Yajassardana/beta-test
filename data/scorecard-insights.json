@@ -21,9 +21,9 @@
       "references": []
     },
     "im-stupid": {
-      "technique": "Validate the Struggle, Not the Identity",
+      "technique": "Validate their Struggle, Not their Identity",
       "explanation": "When a child says \"I'm stupid,\" they're describing how hard something feels, not asking for reassurance. \"You're so smart!\" dismisses the struggle. Naming the effort validates it.",
-      "example": "\"That problem is really frustrating\" vs \"You're so smart!\""
+      "example": "\"This seems really hard and frustrating, tell me more\" vs \"You're smart, I know you can solve it\""
     },
     "i-hate-you": {
       "technique": "\"I Hate You\" Is a Trust Signal",
@@ -35,5 +35,22 @@
       "explanation": "Children don't lie to be deceptive -- they lie because telling the truth feels unsafe. The lie tells you something important: they needed to protect themselves from your reaction.",
       "example": "\"It sounds like something happened that felt hard to tell me about.\""
     }
+  },
+  "research": {
+    "toy-store": [],
+    "im-stupid": [
+      {
+        "title": "Mindset: The new psychology of success.",
+        "url": "https://psycnet.apa.org/record/2006-08575-000",
+        "snippet": "Why praising intelligence creates fixed mindsets and undermines motivation"
+      },
+      {
+        "title": "How to listen so kids will talk",
+        "url": "https://www.goodreads.com/book/show/769016.How_to_Talk_So_Kids_Will_Listen_Listen_So_Kids_Will_Talk",
+        "snippet": "Faber & Mazlish's Framework:\n\n1. Listen with full attention - Stop what you're doing, make eye contact, be present\n2. Acknowledge their feelings with a word - \"Oh...\" \"Mmm...\" \"I see.\"\n3. Give their feelings a name - \"That sounds frustrating\" / \"You seem really disappointed\"\n4. Give them their wishes in fantasy - \"I wish I could make this homework disappear!\" / \"I wish we had ten hours for this project!\""
+      }
+    ],
+    "i-hate-you": [],
+    "the-lie": []
   }
 }

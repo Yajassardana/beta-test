@@ -1,0 +1,8 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "temperature": 1,
+  "max_tokens": 1024,
+  "retry_count": 3,
+  "retry_base_delay_ms": 1000,
+  "max_exchanges": 1
+}

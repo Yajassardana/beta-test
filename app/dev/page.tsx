@@ -58,6 +58,10 @@ export default function DevToolsPage() {
   const [assetManifest, setAssetManifest] = useState<Record<string, ScenarioAssetManifest>>({});
   const [assetEditing, setAssetEditing] = useState<ScenarioAssetManifest>({});
 
+  // Language toggles
+  const [editorLang, setEditorLang] = useState<"en" | "hi">("en");
+  const [testerLang, setTesterLang] = useState<"en" | "hi">("en");
+
   // Conversation tester
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [testInput, setTestInput] = useState("");
@@ -77,14 +81,14 @@ export default function DevToolsPage() {
     if (ids.length > 0 && !selectedId) setSelectedId(ids[0]);
   }
 
-  async function fetchPrompt(id: string) {
-    const res = await fetch(`/api/dev/prompts?id=${id}`);
+  async function fetchPrompt(id: string, lang: "en" | "hi" = "en") {
+    const res = await fetch(`/api/dev/prompts?id=${id}&lang=${lang}`);
     if (res.ok) {
       const data = await res.json();
       setPrompt(data.content);
       setPromptDirty(false);
     } else {
-      setPrompt("(no prompt file found)");
+      setPrompt(`(no ${lang} prompt file found)`);
     }
   }
 
@@ -96,8 +100,8 @@ export default function DevToolsPage() {
     }
   }
 
-  async function fetchToolSchema() {
-    const res = await fetch("/api/dev/tool-schema");
+  async function fetchToolSchema(lang: "en" | "hi" = "en") {
+    const res = await fetch(`/api/dev/tool-schema?lang=${lang}`);
     if (res.ok) {
       const schema = await res.json();
       setSchemaRawJson(JSON.stringify(schema, null, 2));
@@ -150,7 +154,8 @@ export default function DevToolsPage() {
 
   useEffect(() => {
     if (selectedId) {
-      fetchPrompt(selectedId);
+      fetchPrompt(selectedId, editorLang);
+      fetchToolSchema(editorLang);
       const config = scenarios[selectedId];
       if (config) {
         setConfigJson(JSON.stringify(config, null, 2));
@@ -158,7 +163,8 @@ export default function DevToolsPage() {
       }
       setAssetEditing(assetManifest[selectedId] ?? {});
     }
-  }, [selectedId, scenarios, assetManifest]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, scenarios, assetManifest, editorLang]);
 
   useEffect(() => {
     if (conversationRef.current) {
@@ -205,13 +211,13 @@ export default function DevToolsPage() {
 
   async function savePrompt() {
     setSaveStatus("Saving prompt...");
-    await fetch("/api/dev/prompts", {
+    await fetch(`/api/dev/prompts?lang=${editorLang}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: selectedId, content: prompt }),
     });
     setPromptDirty(false);
-    setSaveStatus("Prompt saved");
+    setSaveStatus(`${editorLang.toUpperCase()} prompt saved`);
     setTimeout(() => setSaveStatus(""), 2000);
   }
 
@@ -290,7 +296,7 @@ export default function DevToolsPage() {
     }
 
     setSaveStatus("Saving schema...");
-    const res = await fetch("/api/dev/tool-schema", {
+    const res = await fetch(`/api/dev/tool-schema?lang=${editorLang}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(schema),
@@ -299,7 +305,7 @@ export default function DevToolsPage() {
       const saved = await res.json();
       setSchemaRawJson(JSON.stringify(saved, null, 2));
       parseSchemaToFields(saved);
-      setSaveStatus("Schema saved");
+      setSaveStatus(`${editorLang.toUpperCase()} schema saved`);
     } else {
       const err = await res.json();
       setSaveStatus(`Error: ${err.error}`);
@@ -323,6 +329,7 @@ export default function DevToolsPage() {
         scenario_id: selectedId,
         parent_message: msg,
         history: exchanges,
+        ...(testerLang === "hi" && { voice_mode: "hindi" }),
       },
       {
         onJsonDelta(chunk) {
@@ -412,6 +419,28 @@ export default function DevToolsPage() {
             </option>
           ))}
         </select>
+        <div className="flex rounded border border-zinc-300 p-0.5 dark:border-zinc-700">
+          <button
+            onClick={() => setEditorLang("en")}
+            className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+              editorLang === "en"
+                ? "bg-blue-500 text-white"
+                : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+            }`}
+          >
+            EN
+          </button>
+          <button
+            onClick={() => setEditorLang("hi")}
+            className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+              editorLang === "hi"
+                ? "bg-blue-500 text-white"
+                : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+            }`}
+          >
+            HI
+          </button>
+        </div>
         <span className="text-xs text-zinc-400">
           {llmConfig.model} | T={llmConfig.temperature} | Max={llmConfig.max_tokens}
         </span>
@@ -465,7 +494,7 @@ export default function DevToolsPage() {
                     disabled={!promptDirty}
                     className="rounded bg-blue-600 px-3 py-1 text-xs text-white transition-opacity disabled:opacity-30"
                   >
-                    Save Prompt
+                    Save {editorLang.toUpperCase()} Prompt
                   </button>
                 </div>
                 <textarea
@@ -561,10 +590,23 @@ export default function DevToolsPage() {
                             className="w-full rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800"
                           />
                         </LabeledField>
+                        <LabeledField label="Hindi Intro Video">
+                          <input
+                            value={assetEditing.introHi ?? ""}
+                            onChange={(e) =>
+                              setAssetEditing((a) => ({
+                                ...a,
+                                introHi: e.target.value || undefined,
+                              }))
+                            }
+                            placeholder="intro-hi.mp4"
+                            className="w-full rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800"
+                          />
+                        </LabeledField>
                       </div>
                       <div>
                         <p className="mb-1 text-xs font-medium text-zinc-500">
-                          Emotion Images (state range to image)
+                          Emotion Assets (state range to image + video)
                         </p>
                         <div className="space-y-2">
                           {(assetEditing.emotionImages ?? []).map((ei, i) => (
@@ -611,6 +653,18 @@ export default function DevToolsPage() {
                                 }
                                 placeholder="filename.png"
                                 className="flex-1 rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800"
+                              />
+                              <input
+                                value={ei.video ?? ""}
+                                onChange={(e) =>
+                                  setAssetEditing((a) => {
+                                    const eis = [...(a.emotionImages ?? [])];
+                                    eis[i] = { ...eis[i], video: e.target.value || undefined };
+                                    return { ...a, emotionImages: eis };
+                                  })
+                                }
+                                placeholder="video.mp4"
+                                className="w-28 rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800"
                               />
                               <button
                                 onClick={() =>
@@ -702,6 +756,17 @@ export default function DevToolsPage() {
                         value={scenarioStructured.opening_line}
                         onChange={(e) => {
                           setScenarioStructured((s) => s ? { ...s, opening_line: e.target.value } : s);
+                          setConfigDirty(true);
+                        }}
+                        rows={2}
+                        className="w-full resize-none rounded border border-zinc-300 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+                      />
+                    </LabeledField>
+                    <LabeledField label="Opening Line (Hindi)">
+                      <textarea
+                        value={scenarioStructured.opening_line_hindi}
+                        onChange={(e) => {
+                          setScenarioStructured((s) => s ? { ...s, opening_line_hindi: e.target.value } : s);
                           setConfigDirty(true);
                         }}
                         rows={2}
@@ -896,7 +961,7 @@ export default function DevToolsPage() {
                     onClick={saveToolSchema}
                     className="rounded bg-blue-600 px-3 py-1 text-xs text-white"
                   >
-                    Save Schema
+                    Save {editorLang.toUpperCase()} Schema
                   </button>
                 </div>
 
@@ -1245,6 +1310,101 @@ export default function DevToolsPage() {
                       )}
                     </div>
                   </div>
+
+                  {/* Research References */}
+                  <div>
+                    <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-zinc-500">
+                      Research References
+                    </h3>
+                    <div className="space-y-4">
+                      {Object.keys(scorecardInsights.research ?? {}).map((scenarioId) => {
+                        const refs = scorecardInsights.research?.[scenarioId] ?? [];
+                        return (
+                          <div
+                            key={scenarioId}
+                            className="rounded border border-zinc-200 p-3 dark:border-zinc-700"
+                          >
+                            <p className="mb-2 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                              {scenarioId}
+                            </p>
+                            <div className="space-y-2">
+                              {refs.map((ref, ri) => (
+                                <div key={ri} className="space-y-1 rounded border border-zinc-100 p-2 dark:border-zinc-800">
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      value={ref.title}
+                                      onChange={(e) =>
+                                        setScorecardInsights((prev) => {
+                                          if (!prev) return prev;
+                                          const updated = [...(prev.research?.[scenarioId] ?? [])];
+                                          updated[ri] = { ...updated[ri], title: e.target.value };
+                                          return { ...prev, research: { ...prev.research, [scenarioId]: updated } };
+                                        })
+                                      }
+                                      placeholder="Title"
+                                      className="flex-1 rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800"
+                                    />
+                                    <button
+                                      onClick={() =>
+                                        setScorecardInsights((prev) => {
+                                          if (!prev) return prev;
+                                          const updated = [...(prev.research?.[scenarioId] ?? [])];
+                                          updated.splice(ri, 1);
+                                          return { ...prev, research: { ...prev.research, [scenarioId]: updated } };
+                                        })
+                                      }
+                                      className="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+                                    >
+                                      X
+                                    </button>
+                                  </div>
+                                  <input
+                                    value={ref.url}
+                                    onChange={(e) =>
+                                      setScorecardInsights((prev) => {
+                                        if (!prev) return prev;
+                                        const updated = [...(prev.research?.[scenarioId] ?? [])];
+                                        updated[ri] = { ...updated[ri], url: e.target.value };
+                                        return { ...prev, research: { ...prev.research, [scenarioId]: updated } };
+                                      })
+                                    }
+                                    placeholder="URL"
+                                    className="w-full rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800"
+                                  />
+                                  <textarea
+                                    value={ref.snippet}
+                                    onChange={(e) =>
+                                      setScorecardInsights((prev) => {
+                                        if (!prev) return prev;
+                                        const updated = [...(prev.research?.[scenarioId] ?? [])];
+                                        updated[ri] = { ...updated[ri], snippet: e.target.value };
+                                        return { ...prev, research: { ...prev.research, [scenarioId]: updated } };
+                                      })
+                                    }
+                                    placeholder="Snippet / context"
+                                    rows={2}
+                                    className="w-full resize-none rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800"
+                                  />
+                                </div>
+                              ))}
+                              <button
+                                onClick={() =>
+                                  setScorecardInsights((prev) => {
+                                    if (!prev) return prev;
+                                    const updated = [...(prev.research?.[scenarioId] ?? []), { title: "", url: "", snippet: "" }];
+                                    return { ...prev, research: { ...prev.research, [scenarioId]: updated } };
+                                  })
+                                }
+                                className="rounded border border-dashed border-zinc-300 px-2 py-1 text-xs text-zinc-500 hover:border-zinc-400 dark:border-zinc-600"
+                              >
+                                + Add Research
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -1261,6 +1421,34 @@ export default function DevToolsPage() {
             <span className="text-xs text-zinc-400">
               {exchanges.length}/{llmConfig.max_exchanges}
             </span>
+            <div className="flex rounded border border-zinc-300 p-0.5 dark:border-zinc-700">
+              <button
+                onClick={() => {
+                  setTesterLang("en");
+                  resetConversation();
+                }}
+                className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+                  testerLang === "en"
+                    ? "bg-green-500 text-white"
+                    : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => {
+                  setTesterLang("hi");
+                  resetConversation();
+                }}
+                className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+                  testerLang === "hi"
+                    ? "bg-green-500 text-white"
+                    : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                }`}
+              >
+                HI
+              </button>
+            </div>
             <div className="flex-1" />
             <button
               onClick={() => setShowHistory(!showHistory)}

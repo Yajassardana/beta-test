@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { ScorecardInsights, EndingInsight, ScenarioAha, ScorecardEnding } from "./types";
+import { ScorecardInsights, EndingInsight, ScenarioAha, ScorecardEnding, ResearchReference } from "./types";
 
 const INSIGHTS_PATH = join(process.cwd(), "data", "scorecard-insights.json");
 
@@ -51,6 +51,13 @@ export const DEFAULT_SCENARIO_AHA: Record<string, ScenarioAha> = {
   },
 };
 
+export const DEFAULT_SCENARIO_RESEARCH: Record<string, ResearchReference[]> = {
+  "toy-store": [],
+  "im-stupid": [],
+  "i-hate-you": [],
+  "the-lie": [],
+};
+
 export function getScorecardInsights(): ScorecardInsights {
   let fileData: Partial<ScorecardInsights> = {};
   if (existsSync(INSIGHTS_PATH)) {
@@ -65,5 +72,6 @@ export function getScorecardInsights(): ScorecardInsights {
   return {
     endings: { ...DEFAULT_ENDING_INSIGHTS, ...fileData.endings },
     scenarios: { ...DEFAULT_SCENARIO_AHA, ...fileData.scenarios },
+    research: { ...DEFAULT_SCENARIO_RESEARCH, ...fileData.research },
   };
 }

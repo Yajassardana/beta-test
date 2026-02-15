@@ -14,13 +14,21 @@ export interface ScenarioAha {
   references?: Array<{ label: string; url: string }>;
 }
 
+export interface ResearchReference {
+  title: string;
+  url: string;
+  snippet: string;
+}
+
 export interface ScorecardInsights {
   endings: Record<ScorecardEnding, EndingInsight>;
   scenarios: Record<string, ScenarioAha>;
+  research: Record<string, ResearchReference[]>;
 }
 
 export interface ChildResponse {
   child_dialogue: string;
+  child_dialogue_devanagari?: string;
   what_child_heard: string;
   emotional_state: number;
   child_inner_feeling: string;
@@ -48,6 +56,7 @@ export interface ScenarioConfig {
   child_name: string;
   child_age: number;
   opening_line: string;
+  opening_line_hindi: string;
   opening_inner_feeling: string;
   opening_emotional_state: number;
 }

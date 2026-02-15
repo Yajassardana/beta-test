@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "child_dialogue_devanagari": {
+      "type": "string",
+      "description": "The child's dialogue in Devanagari script (e.g., 'पापा, मुझे अभी चाहिए!'). MUST be output FIRST. (1 sentence, visceral and simple, from the child's perspective)"
+    },
+    "child_dialogue": {
+      "type": "string",
+      "description": "The child's dialogue in Romanized Hindi (Hindi written in English letters, e.g., 'Papa, mujhe abhi chahiye!') (1 sentence, visceral and simple, from the child's perspective)"
+    },
+    "what_child_heard": {
+      "type": "string",
+      "description": "The meaning the child extracted from the parent's words (1 sentence, visceral and simple, from the child's perspective)"
+    },
+    "emotional_state": {
+      "type": "number",
+      "description": "0-10, the child's internal emotional state"
+    },
+    "child_inner_feeling": {
+      "type": "string",
+      "description": "What the child is actually feeling but can't articulate - Romanized Hindi"
+    },
+    "is_resolved": {
+      "type": "string",
+      "description": "Current state: ongoing = keep going, resolution = child re-engaged, meltdown = child beyond reach",
+      "enum": [
+        "ongoing",
+        "resolution",
+        "meltdown"
+      ]
+    }
+  },
+  "required": [
+    "child_dialogue_devanagari",
+    "child_dialogue",
+    "what_child_heard",
+    "emotional_state",
+    "child_inner_feeling",
+    "is_resolved"
+  ]
+}

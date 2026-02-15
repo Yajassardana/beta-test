@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
-const SCHEMA_PATH = join(process.cwd(), "data", "tool-schema.json");
+const DATA_DIR = join(process.cwd(), "data");
 
 const DEFAULT_SCHEMA: Record<string, unknown> = {
   type: "object",
@@ -40,16 +40,45 @@ const DEFAULT_SCHEMA: Record<string, unknown> = {
   ],
 };
 
-export function getToolSchema(): Record<string, unknown> {
-  if (!existsSync(SCHEMA_PATH)) {
-    return DEFAULT_SCHEMA;
+export function getToolSchema(lang: "en" | "hi" = "en"): Record<string, unknown> {
+  const filename = lang === "hi" ? "tool-schema-hi.json" : "tool-schema.json";
+  const schemaPath = join(DATA_DIR, filename);
+
+  if (existsSync(schemaPath)) {
+    try {
+      return JSON.parse(readFileSync(schemaPath, "utf-8"));
+    } catch { /* fall through */ }
   }
-  try {
-    const raw = readFileSync(SCHEMA_PATH, "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return DEFAULT_SCHEMA;
-  }
+
+  if (lang === "hi") return buildHindiSchema(getToolSchema("en"));
+  return DEFAULT_SCHEMA;
+}
+
+export function buildHindiSchema(
+  base: Record<string, unknown>
+): Record<string, unknown> {
+  const schema = structuredClone(base);
+  const props = schema.properties as Record<string, unknown>;
+  const required = schema.required as string[];
+
+  schema.properties = {
+    child_dialogue_devanagari: {
+      type: "string",
+      description:
+        "The child's dialogue in Devanagari script (e.g., 'पापा, मुझे अभी चाहिए!'). MUST be output FIRST.",
+    },
+    ...props,
+  };
+
+  (schema.properties as Record<string, Record<string, string>>).child_dialogue =
+    {
+      type: "string",
+      description:
+        "The child's dialogue in Romanized Hindi (Hindi written in English letters, e.g., 'Papa, mujhe abhi chahiye!')",
+    };
+
+  schema.required = ["child_dialogue_devanagari", ...required];
+  return schema;
 }
 
 export { DEFAULT_SCHEMA };

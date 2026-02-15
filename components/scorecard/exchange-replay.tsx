@@ -8,6 +8,7 @@ interface ExchangeReplayProps {
   exchanges: Exchange[];
   scenario: ScenarioConfig;
   deltas: ExchangeDelta[];
+  language: "en" | "hi";
 }
 
 function TrackBadge({ delta }: { delta: number }) {
@@ -39,9 +40,10 @@ export function ExchangeReplay({
   exchanges,
   scenario,
   deltas,
+  language,
 }: ExchangeReplayProps) {
-  const STAGGER_BASE = 0.8;
-  const STAGGER_STEP = 0.25;
+  const STAGGER_BASE = 1.6;
+  const STAGGER_STEP = 0.5;
 
   return (
     <div className="space-y-3">
@@ -52,7 +54,7 @@ export function ExchangeReplay({
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0 }}
+          transition={{ duration: 0.7, delay: 0 }}
           className="mr-auto max-w-[80%]"
         >
           <div className="rounded-2xl rounded-tl-sm border-2 border-border bg-child-bg px-4 py-2.5 shadow-[2px_2px_0px_0px_var(--border)]">
@@ -60,7 +62,7 @@ export function ExchangeReplay({
               {scenario.child_name}
             </p>
             <p className="mt-1 text-sm leading-relaxed">
-              {scenario.opening_line}
+              {language === "hi" ? scenario.opening_line_hindi : scenario.opening_line}
             </p>
           </div>
         </motion.div>
@@ -76,7 +78,7 @@ export function ExchangeReplay({
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: baseDelay }}
+                transition={{ duration: 0.7, delay: baseDelay }}
                 className="ml-auto max-w-[80%]"
               >
                 <div className="rounded-2xl rounded-tr-sm border-2 border-border bg-parent-bg px-4 py-2.5 shadow-[2px_2px_0px_0px_var(--border)]">
@@ -96,7 +98,7 @@ export function ExchangeReplay({
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: baseDelay + STAGGER_STEP }}
+                transition={{ duration: 0.6, delay: baseDelay + STAGGER_STEP }}
                 className="mx-auto max-w-[90%]"
               >
                 <div className="relative overflow-hidden rounded-base border-2 border-border bg-foreground px-4 py-3">
@@ -121,7 +123,7 @@ export function ExchangeReplay({
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: 0.35,
+                  duration: 0.7,
                   delay: baseDelay + STAGGER_STEP * 2,
                 }}
                 className="mr-auto max-w-[80%]"

@@ -1,0 +1,42 @@
+{
+  "toy-store": {},
+  "im-stupid": {
+    "images": [
+      "crying.png",
+      "crying_less.png",
+      "crying_stop.png",
+      "happy.png"
+    ],
+    "emotionImages": [
+      {
+        "range": [
+          1,
+          3
+        ],
+        "image": "crying.png",
+        "video": "crying-video.mp4"
+      },
+      {
+        "range": [
+          4,
+          6
+        ],
+        "image": "neutral.png",
+        "video": "neutral-video.mp4"
+      },
+      {
+        "range": [
+          7,
+          10
+        ],
+        "image": "happy.png",
+        "video": "happy-video.mp4"
+      }
+    ],
+    "profile": "profile.png",
+    "intro": "intro.mp4",
+    "introHi": "intro-hi.mp4"
+  },
+  "i-hate-you": {},
+  "the-lie": {}
+}

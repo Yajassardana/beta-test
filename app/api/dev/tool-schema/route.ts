@@ -1,23 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
-import { DEFAULT_SCHEMA } from "@/lib/tool-schema";
+import { getToolSchema } from "@/lib/tool-schema";
 
-const SCHEMA_PATH = join(process.cwd(), "data", "tool-schema.json");
-
-export async function GET() {
-  if (!existsSync(SCHEMA_PATH)) {
-    return NextResponse.json(DEFAULT_SCHEMA);
-  }
-  try {
-    const raw = readFileSync(SCHEMA_PATH, "utf-8");
-    return NextResponse.json(JSON.parse(raw));
-  } catch {
-    return NextResponse.json(DEFAULT_SCHEMA);
-  }
+export async function GET(request: NextRequest) {
+  const lang = (request.nextUrl.searchParams.get("lang") || "en") as "en" | "hi";
+  const schema = getToolSchema(lang);
+  return NextResponse.json(schema);
 }
 
 export async function PUT(request: NextRequest) {
+  const lang = (request.nextUrl.searchParams.get("lang") || "en") as "en" | "hi";
+
   let schema: Record<string, unknown>;
   try {
     schema = await request.json();
@@ -32,8 +26,10 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const dir = dirname(SCHEMA_PATH);
+  const filename = lang === "hi" ? "tool-schema-hi.json" : "tool-schema.json";
+  const schemaPath = join(process.cwd(), "data", filename);
+  const dir = dirname(schemaPath);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  writeFileSync(SCHEMA_PATH, JSON.stringify(schema, null, 2), "utf-8");
+  writeFileSync(schemaPath, JSON.stringify(schema, null, 2), "utf-8");
   return NextResponse.json(schema);
 }

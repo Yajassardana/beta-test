@@ -5,6 +5,7 @@ import { ScorecardInsights } from "@/lib/types";
 import {
   DEFAULT_ENDING_INSIGHTS,
   DEFAULT_SCENARIO_AHA,
+  DEFAULT_SCENARIO_RESEARCH,
 } from "@/lib/scorecard-insights";
 
 const INSIGHTS_PATH = join(process.cwd(), "data", "scorecard-insights.json");
@@ -22,6 +23,7 @@ function getInsights(): ScorecardInsights {
   return {
     endings: { ...DEFAULT_ENDING_INSIGHTS, ...fileData.endings },
     scenarios: { ...DEFAULT_SCENARIO_AHA, ...fileData.scenarios },
+    research: { ...DEFAULT_SCENARIO_RESEARCH, ...fileData.research },
   };
 }
 
@@ -40,6 +42,7 @@ export async function PUT(request: NextRequest) {
   const merged: ScorecardInsights = {
     endings: { ...DEFAULT_ENDING_INSIGHTS, ...body.endings },
     scenarios: { ...DEFAULT_SCENARIO_AHA, ...body.scenarios },
+    research: { ...DEFAULT_SCENARIO_RESEARCH, ...body.research },
   };
 
   const dir = dirname(INSIGHTS_PATH);

@@ -11,6 +11,7 @@ interface RequestBody {
   scenario_id: string;
   parent_message: string;
   history: Exchange[];
+  voice_mode?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -39,8 +40,9 @@ export async function POST(request: NextRequest) {
   }
 
   const config = getDevConfig();
-  const toolSchema = getToolSchema();
-  const systemPrompt = getSystemPrompt(scenario);
+  const lang: "en" | "hi" = body.voice_mode === "hindi" ? "hi" : "en";
+  const toolSchema = getToolSchema(lang);
+  const systemPrompt = getSystemPrompt(scenario, lang);
   const messages = buildMessages(history, parent_message);
 
   const tool: Anthropic.Tool = {
@@ -58,7 +60,13 @@ export async function POST(request: NextRequest) {
         model: config.model,
         max_tokens: config.max_tokens,
         temperature: config.temperature,
-        system: systemPrompt,
+        system: [
+          {
+            type: "text" as const,
+            text: systemPrompt,
+            cache_control: { type: "ephemeral" as const },
+          },
+        ],
         messages,
         tools: [tool],
         tool_choice: { type: "tool", name: "child_response" },
@@ -162,6 +170,8 @@ function buildMessages(
         },
       ],
     });
+    const isLastHistoryEntry = i === history.length - 1;
+
     messages.push({
       role: "user",
       content: [
@@ -169,6 +179,9 @@ function buildMessages(
           type: "tool_result",
           tool_use_id: toolUseId,
           content: "Response delivered to parent. Awaiting next message.",
+          ...(isLastHistoryEntry && {
+            cache_control: { type: "ephemeral" as const },
+          }),
         },
       ],
     });

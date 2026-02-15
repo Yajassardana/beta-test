@@ -15,11 +15,13 @@
 export interface EmotionImage {
   range: [number, number];
   image: string;
+  video?: string;
 }
 
 export interface ScenarioAssetManifest {
   profile?: string;
   intro?: string;
+  introHi?: string;
   images?: string[];
   emotionImages?: EmotionImage[];
 }
@@ -69,6 +71,18 @@ export function resolveIntroPath(scenarioId: string, manifest: Record<string, Sc
   return `${basePath(scenarioId)}/${m.intro}`;
 }
 
+export function resolveIntroPathForLang(
+  scenarioId: string,
+  lang: "en" | "hi",
+  manifest: Record<string, ScenarioAssetManifest>,
+): string | null {
+  const m = manifest[scenarioId];
+  if (!m) return null;
+  const filename = lang === "hi" ? (m.introHi ?? m.intro) : m.intro;
+  if (!filename) return null;
+  return `${basePath(scenarioId)}/${filename}`;
+}
+
 export function resolveEmotionImage(
   scenarioId: string,
   emotionalState: number,
@@ -81,26 +95,51 @@ export function resolveEmotionImage(
   return match ? `${basePath(scenarioId)}/${match.image}` : null;
 }
 
+export function resolveEmotionVideo(
+  scenarioId: string,
+  emotionalState: number,
+  manifest: ScenarioAssetManifest | undefined,
+): string | null {
+  if (!manifest?.emotionImages?.length) return null;
+  const match = manifest.emotionImages.find(
+    (ei) => emotionalState >= ei.range[0] && emotionalState <= ei.range[1],
+  );
+  if (!match?.video) return null;
+  return `${basePath(scenarioId)}/${match.video}`;
+}
+
 export function getScenarioAssetInfo(scenarioId: string): {
   hasProfile: boolean;
   hasIntro: boolean;
+  hasIntroHi: boolean;
   imageCount: number;
+  videoCount: number;
   allFiles: string[];
 } {
   const manifest = SCENARIO_ASSETS[scenarioId];
   if (!manifest) {
-    return { hasProfile: false, hasIntro: false, imageCount: 0, allFiles: [] };
+    return { hasProfile: false, hasIntro: false, hasIntroHi: false, imageCount: 0, videoCount: 0, allFiles: [] };
   }
 
   const allFiles: string[] = [];
   if (manifest.profile) allFiles.push(manifest.profile);
   if (manifest.intro) allFiles.push(manifest.intro);
+  if (manifest.introHi) allFiles.push(manifest.introHi);
   if (manifest.images) allFiles.push(...manifest.images);
+
+  const videoCount = manifest.emotionImages?.filter((ei) => ei.video).length ?? 0;
+  if (manifest.emotionImages) {
+    for (const ei of manifest.emotionImages) {
+      if (ei.video) allFiles.push(ei.video);
+    }
+  }
 
   return {
     hasProfile: !!manifest.profile,
     hasIntro: !!manifest.intro,
+    hasIntroHi: !!manifest.introHi,
     imageCount: manifest.images?.length ?? 0,
+    videoCount,
     allFiles,
   };
 }

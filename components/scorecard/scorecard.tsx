@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Exchange,
+  ResearchReference,
   ScenarioConfig,
   ScorecardEnding,
   ScorecardInsights,
 } from "@/lib/types";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   buildChartData,
   computeExchangeDeltas,
@@ -33,6 +35,7 @@ interface ScorecardProps {
   scenario: ScenarioConfig;
   ending: ScorecardEnding;
   insights: ScorecardInsights;
+  language: "en" | "hi";
   onTryAgain: () => void;
 }
 
@@ -41,6 +44,7 @@ export function Scorecard({
   scenario,
   ending,
   insights,
+  language,
   onTryAgain,
 }: ScorecardProps) {
   const chartData = useMemo(
@@ -54,6 +58,7 @@ export function Scorecard({
 
   const banner = ENDING_BANNER[ending];
   const scenarioAha = insights.scenarios[scenario.id];
+  const research: ResearchReference[] = insights.research?.[scenario.id] ?? [];
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 pb-12">
@@ -89,6 +94,7 @@ export function Scorecard({
           exchanges={exchanges}
           scenario={scenario}
           deltas={deltas}
+          language={language}
         />
       </motion.div>
 
@@ -112,11 +118,43 @@ export function Scorecard({
         <EmotionalArcChart data={chartData} />
       </motion.div>
 
+      {/* Research References */}
+      {research.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <div className="space-y-3">
+            <h3 className="font-heading text-base">Research</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {research.map((ref, i) => (
+                <Card key={i} className="py-3">
+                  <CardContent>
+                    <a
+                      href={ref.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-heading text-sm text-main hover:underline"
+                    >
+                      {ref.title}
+                    </a>
+                    <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
+                      {ref.snippet}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Bottom actions */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.5 }}
+        transition={{ duration: 0.4, delay: 0.6 }}
         className="flex items-center justify-center gap-3 pt-4"
       >
         <Button variant="default" onClick={onTryAgain}>

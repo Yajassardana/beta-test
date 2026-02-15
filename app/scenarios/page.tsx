@@ -55,7 +55,7 @@ export default function ScenariosPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <main className="mx-auto max-w-4xl px-6 py-6">
         <div className="mb-8 flex items-center justify-between">
           <Link href="/">
             <Button variant="neutral" size="sm">
@@ -63,17 +63,17 @@ export default function ScenariosPage() {
             </Button>
           </Link>
           <motion.h1
-            className="font-heading text-2xl text-foreground"
+            className="font-heading text-4xl font-bold text-foreground"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
-            Choose a Scenario
+            Scenario
           </motion.h1>
           <div className="w-20" />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-1 justify-items-center">
           {scenarioOrder.map((id, index) => {
             const scenario = scenarios[id];
             const accent = accentColors[id];
@@ -90,25 +90,25 @@ export default function ScenariosPage() {
                   ease: "easeOut",
                 }}
                 whileHover={{ y: -4, transition: { duration: 0.15 } }}
-                whileTap={{ scale: 0.98 }}
+                className="w-full max-w-md"
               >
-                <Link href={`/scenario/${id}`} className="block h-full">
-                  <Card className="relative h-full overflow-hidden transition-shadow hover:shadow-[6px_6px_0px_0px] hover:shadow-shadow">
-                    <div
-                      className="h-1 w-full rounded-t-base"
-                      style={{ backgroundColor: accent }}
-                    />
-                    <ProfileImage path={profilePath} childName={scenario.child_name} />
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {scenario.title}
-                      </CardTitle>
-                      <CardDescription className="text-text-secondary">
-                        {scenario.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-1" />
-                    <CardFooter className="gap-2">
+                <Card className="relative h-full overflow-hidden">
+                  <div
+                    className="h-1 w-full rounded-t-base"
+                    style={{ backgroundColor: accent }}
+                  />
+                  <ProfileImage path={profilePath} childName={scenario.child_name} />
+                  <CardHeader>
+                    <CardTitle className="text-lg">
+                      {scenario.title}
+                    </CardTitle>
+                    <CardDescription className="text-text-secondary">
+                      {scenario.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1" />
+                  <CardFooter className="flex-col items-stretch gap-3">
+                    <div className="flex gap-2">
                       <Badge variant="neutral">
                         {scenario.child_name}, age {scenario.child_age}
                       </Badge>
@@ -118,21 +118,43 @@ export default function ScenariosPage() {
                       >
                         Starting State {scenario.opening_emotional_state}/10
                       </Badge>
-                    </CardFooter>
-                  </Card>
-                </Link>
+                    </div>
+                    <div className="flex gap-2">
+                      <Link href={`/voice/${id}?lang=en`} className="flex-1">
+                        <Button
+                          variant="neutral"
+                          size="sm"
+                          className="w-full"
+                          style={{ borderColor: "#2563EB" }}
+                        >
+                          English Voice
+                        </Button>
+                      </Link>
+                      <Link href={`/voice/${id}?lang=hi`} className="flex-1">
+                        <Button
+                          variant="neutral"
+                          size="sm"
+                          className="w-full"
+                          style={{ borderColor: "#E67E22" }}
+                        >
+                          Hindi Voice
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardFooter>
+                </Card>
               </motion.div>
             );
           })}
         </div>
 
         <motion.footer
-          className="mt-16 text-center text-sm text-text-muted"
+          className="mt-6 text-center text-sm text-text-muted"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.4 }}
         >
-          Built for the Anthropic Hackathon, Feb 2026
+          Build India Hackathon, Feb 2026
         </motion.footer>
       </main>
     </div>

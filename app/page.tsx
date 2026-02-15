@@ -65,12 +65,12 @@ export default function Home() {
         </motion.div>
 
         <motion.footer
-          className="mt-16 text-sm text-text-muted"
+          className="mt-6 text-sm text-text-muted"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.4 }}
         >
-          Built for the Anthropic Hackathon, Feb 2026
+          Built for the Build India Hackathon, Feb 2026
         </motion.footer>
       </main>
     </div>

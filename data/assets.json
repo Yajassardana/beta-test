@@ -10,23 +10,23 @@
     "emotionImages": [
       {
         "range": [
-          1,
-          3
+          0,
+          4
         ],
         "image": "crying.png",
         "video": "crying-video.mp4"
       },
       {
         "range": [
-          4,
-          6
+          5,
+          7
         ],
         "image": "neutral.png",
         "video": "neutral-video.mp4"
       },
       {
         "range": [
-          7,
+          8,
           10
         ],
         "image": "happy.png",

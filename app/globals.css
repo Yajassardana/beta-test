@@ -1,26 +1,126 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --border-radius: 5px;
+  --box-shadow-x: 4px;
+  --box-shadow-y: 4px;
+  --reverse-box-shadow-x: -4px;
+  --reverse-box-shadow-y: -4px;
+
+  --heading-font-weight: 700;
+  --base-font-weight: 500;
+
+  /* Warm Brutalism palette */
+  --background: #F5F3F0;
+  --secondary-background: #FFFFFF;
+  --foreground: #1A1A1A;
+  --main: #E67E22;
+  --main-foreground: #FFFFFF;
+  --border: #1A1A1A;
+  --ring: #1A1A1A;
+  --overlay: rgba(26, 26, 26, 0.8);
+
+  --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
+
+  /* Child / Parent accents */
+  --child-accent: #E67E22;
+  --child-bg: #FFF3E6;
+  --parent-accent: #2563EB;
+  --parent-bg: #EFF4FF;
+
+  /* Text variants */
+  --text-secondary: #6B6560;
+  --text-muted: #A39E99;
+
+  /* Semantic */
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
+  --success: #16A34A;
+  --success-bg: #F0FDF4;
+  --warning: #EAB308;
+  --warning-bg: #FEFCE8;
+
+  /* Dashboard tints (applied via JS based on safety score) */
+  --dashboard-tint-safe: #F0FDF4;
+  --dashboard-tint-neutral: #F5F3F0;
+  --dashboard-tint-tense: #FFF7ED;
+  --dashboard-tint-crisis: #FEF2F2;
+
+  /* Chart colors */
+  --chart-1: #E67E22;
+  --chart-2: #2563EB;
+  --chart-3: #16A34A;
+  --chart-4: #EAB308;
+  --chart-5: #DC2626;
 }
 
 @theme inline {
+  /* Colors */
+  --color-main: var(--main);
   --color-background: var(--background);
+  --color-secondary-background: var(--secondary-background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-main-foreground: var(--main-foreground);
+  --color-border: var(--border);
+  --color-overlay: var(--overlay);
+  --color-ring: var(--ring);
+
+  --color-child-accent: var(--child-accent);
+  --color-child-bg: var(--child-bg);
+  --color-parent-accent: var(--parent-accent);
+  --color-parent-bg: var(--parent-bg);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+
+  --color-dashboard-tint-safe: var(--dashboard-tint-safe);
+  --color-dashboard-tint-neutral: var(--dashboard-tint-neutral);
+  --color-dashboard-tint-tense: var(--dashboard-tint-tense);
+  --color-dashboard-tint-crisis: var(--dashboard-tint-crisis);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Shadow */
+  --shadow-shadow: var(--shadow);
+
+  /* Spacing for box shadow hover translations */
+  --spacing-boxShadowX: var(--box-shadow-x);
+  --spacing-boxShadowY: var(--box-shadow-y);
+  --spacing-reverseBoxShadowX: var(--reverse-box-shadow-x);
+  --spacing-reverseBoxShadowY: var(--reverse-box-shadow-y);
+
+  /* Border radius */
+  --radius-base: var(--border-radius);
+
+  /* Font weights */
+  --font-weight-base: var(--base-font-weight);
+  --font-weight-heading: var(--heading-font-weight);
+
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-dm-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-background text-foreground font-base antialiased;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+    font-family: var(--font-heading);
+  }
 }
